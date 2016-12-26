@@ -97,22 +97,27 @@ class Mover {
   }
 }
 
-var mover
+var movers = []
 
 function setup() {
   createCanvas(640, 360);
 
-  var x = width / 2;
-  var y = height / 2;
-  var vx = 0;
-  var vy = 0;
-  mover = new Mover(x, y, vx, vy);
+  for (var i = 0; i < 10; i++) {
+    var x = Math.random() * width;
+    var y = Math.random() * height;
+    var vx = 0;
+    var vy = 0;
+    var mover = new Mover(x, y, vx, vy);
+    movers.push(mover);
+  }
 }
 
 function draw() {
   background(255);
 
-  mover.update();
-  mover.checkEdges();
-  mover.display();
+  movers.forEach(function(m) {
+    m.update();
+    m.checkEdges();
+    m.display();
+  });
 }

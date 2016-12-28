@@ -94,3 +94,9 @@ function draw() {
 function mouseClicked() {
   ps.scatter();
 }
+
+function keyPressed() {
+  if (32 == keyCode) { // space key is pressed
+     saveCanvas('canvas-demo', 'png');
+  }
+}

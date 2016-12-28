@@ -93,3 +93,25 @@ class Particle {
     return this.lifespan < 0.0;
   }
 }
+
+class ParticleSystem {
+
+  constructor(origin) {
+    this.origin = origin;
+    this.particles = [];
+  }
+
+  generateParticle() {
+    var p = new Particle(new PVector(this.origin.x, this.origin.y));
+    this.particles.push(p);
+  }
+
+  run() {
+    this.particles = this.particles.filter(function(p) {
+      return !p.isDead();
+    });
+    this.particles.forEach(function(p) {
+      p.run();
+    });
+  }
+}

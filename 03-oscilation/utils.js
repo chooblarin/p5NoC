@@ -154,6 +154,7 @@ class Pendulum {
     this.angle = PI / 4;
     this.aVelocity = 0;
     this.aAcceleration = 0;
+    this.damping = 0.995;
   }
 
   update() {
@@ -161,6 +162,8 @@ class Pendulum {
     this.aAcceleration = -1 * g / this.r * sin(this.angle);
     this.aVelocity += this.aAcceleration;
     this.angle += this.aVelocity;
+
+    this.aVelocity *= this.damping;
   }
 
   display() {

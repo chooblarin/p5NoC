@@ -1,37 +1,41 @@
 class Particle {
 
   constructor() {
-    this.x = Math.random() * width;
-    this.y = Math.random() * height;
+
     this.accel = 4000.0;
     this.damp = 0.00002;
 
-    this.vx = this.accel / 2 - Math.random() * this.accel;
-    this.vy = this.accel / 2 - Math.random() * this.accel;
+    var x = random(width);
+    var y = random(height);
+    var vx = random(-this.accel / 2, this.accel / 2);
+    var vy = random(-this.accel / 2, this.accel / 2);
+
+    this.position = createVector(x, y);
+    this.velocity = createVector(vx, vy);
   }
 
   update() {
-    this.x += this.vx;
-    this.y += this.vy;
-
-    this.vx *= this.damp;
-    this.vy *= this.damp;
+    this.position.add(this.velocity);
+    this.velocity.mult(this.damp);
   }
 }
 
 class Attractor {
 
   constructor(x, y) {
-    this.x = x || Math.random() * width;
-    this.y = y || Math.random() * height;
+    var x = x || random(width);
+    var y = y || random(height);
+    this.position = createVector(x, y);
   }
 
   attract(p) {
-    var d2 = (this.x - p.x) * (this.x - p.x) + (this.y - p.y) * (this.y - p.y);
-    if (0.01 < d2) { // avoid dividion by zero
+    var vec = p5.Vector.sub(this.position, p.position);
+    var distSq = vec.magSq();
+    if (0.01 < distSq) { // avoid dividion by zero
         // accelerate towards attractor
-        p.vx += p.accel * (this.x - p.x) / d2;
-        p.vy += p.accel * (this.y - p.y) / d2;
+        vec.mult(p.accel);
+        vec.div(distSq);
+        p.velocity.add(vec);
         p.update();
     }
   }
@@ -52,11 +56,10 @@ class ParticleSystem {
     for (var i = 0; i < this.particles.length; i++) {
       var p = this.particles[i];
       for (var j = 0; j < this.attractors.length; j++) {
-        var a = this.attractors[j];
-        a.attract(p);        
+        this.attractors[j].attract(p);
       }
       p.update();
-      vertex(p.x, p.y);
+      vertex(p.position.x, p.position.y);
     }
     endShape();
   }

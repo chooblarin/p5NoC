@@ -51,6 +51,10 @@ class PVector {
     return new PVector(v1.x - v2.x, v1.y - v2.y);
   }
 
+  static mult(v, n) {
+    return new PVector(v.x * n, v.y * n);
+  }
+
   static div(v, n) {
     return new PVector(v.x / n, v.y / n);
   }
@@ -58,12 +62,11 @@ class PVector {
 
 class Mover {
 
-  constructor(x, y, vx, vy) {
+  constructor(x, y, m) {
     this.position = new PVector(x, y);
-    this.verocity = new PVector(vx, vy);
-    this.acceleration = new PVector(-0.001, 0.01);
-    this.mass = 1;
-    this.topSpeed = 10;
+    this.velocity = new PVector(0, 0);
+    this.acceleration = new PVector(0.0, 0.0);
+    this.mass = m;
   }
 
   applyForce(force) {
@@ -72,22 +75,22 @@ class Mover {
   }
 
   update() {
-    this.verocity.add(this.acceleration);
-    this.position.add(this.verocity);
+    this.velocity.add(this.acceleration);
+    this.position.add(this.velocity);
     this.acceleration.mult(0);
   }
 
   checkEdges() {
     if (width < this.position.x) {
       this.position.x = width;
-      this.verocity.x *= -1;
+      this.velocity.x *= -1;
     } else if (this.position.x < 0) {
-      this.verocity.x *= -1;
+      this.velocity.x *= -1;
       this.position.x = 0;
     }
 
     if (height < this.position.y) {
-      this.verocity.y *= -1;
+      this.velocity.y *= -1;
       this.position.y = height;
     }
   }
@@ -95,6 +98,40 @@ class Mover {
   display() {
     stroke(0);
     fill(175);
-    ellipse(this.position.x, this.position.y, this.mass * 16, this.mass * 16);
+    var size = this.mass * 24 + 12
+    ellipse(this.position.x, this.position.y, size, size);
+  }
+}
+
+class Liquid {
+
+  constructor(x, y, w, h, c) {
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.c = c;
+  }
+
+  contains(mover) {
+    var p = mover.position;
+    return this.x <= p.x && p.x <= (this.w - this.x) && this.y <= p.y && p.y < (this.h + this.y);
+  }
+
+  drag(m) {
+    var speed = m.velocity.mag();
+    var dragMagnitude = this.c * speed * speed;
+
+    var d = PVector.mult(m.velocity, -1);
+    d.normalize();
+    d.mult(dragMagnitude);
+
+    m.applyForce(d);
+  }
+
+  display() {
+    noStroke();
+    fill(175);
+    rect(this.x, this.y, this.w, this.h);
   }
 }

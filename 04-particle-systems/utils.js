@@ -63,12 +63,17 @@ class PVector {
 class Particle {
 
   constructor(position) {
-    this.acceleration = new PVector(0, 0.05);
+    this.acceleration = new PVector(0, 0);
     var vx = 2.0 * Math.random() - 1.0;
     var vy = - 2.0 * Math.random();
     this.velocity = new PVector(vx, vy);
     this.position = position;
+    this.mass = 1;
     this.lifespan = 255.0;
+  }
+
+  applyForce(f) {
+    this.acceleration.add(PVector.div(f, this.mass));
   }
 
   run() {
@@ -79,6 +84,7 @@ class Particle {
   update() {
     this.velocity.add(this.acceleration);
     this.position.add(this.velocity);
+    this.acceleration.mult(0);
     this.lifespan -= 2.0;
   }
 
@@ -94,6 +100,32 @@ class Particle {
   }
 }
 
+class Repeller {
+
+  constructor(x, y) {
+    this.position = new PVector(x, y);
+    this.r = 30;
+    this.strength = 100;
+  }
+
+  repel(particle) {
+    var dir = PVector.sub(this.position, particle.position);
+    var d = dir.mag();
+    d = constrain(d, 5, 100);
+    dir.normalize();
+    var force = -1 * this.strength / (d * d);
+    dir.mult(force);
+    return dir;
+  }
+
+  display() {
+    stroke(0);
+    fill(20, 100);
+    var size = this.r * 2;
+    ellipse(this.position.x, this.position.y, size, size);
+  }
+}
+
 class ParticleSystem {
 
   constructor(origin) {
@@ -106,11 +138,24 @@ class ParticleSystem {
     this.particles.push(p);
   }
 
+  applyForce(f) {
+    this.particles.forEach(function (p) {
+      p.applyForce(f);
+    });
+  }
+
+  applyRepeller(r) {
+    this.particles.forEach(function (p) {
+      var f = r.repel(p);
+      p.applyForce(f);
+    });
+  }
+
   run() {
-    this.particles = this.particles.filter(function(p) {
+    this.particles = this.particles.filter(function (p) {
       return !p.isDead();
     });
-    this.particles.forEach(function(p) {
+    this.particles.forEach(function (p) {
       p.run();
     });
   }

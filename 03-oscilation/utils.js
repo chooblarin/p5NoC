@@ -132,7 +132,7 @@ class Oscillator {
   }
 
   display() {
-    var x = sin(this.angle.x) * this.amplitude.x;
+    var x = cos(this.angle.x) * this.amplitude.x;
     var y = sin(this.angle.y) * this.amplitude.y;
 
     push();
@@ -143,5 +143,33 @@ class Oscillator {
     line(0, 0, x, y);
     ellipse(x, y, 16, 16);
     pop();
+  }
+}
+
+class Pendulum {
+
+  constructor(origin, r) {
+    this.origin = origin;
+    this.r = r;
+    this.angle = PI / 4;
+    this.aVelocity = 0;
+    this.aAcceleration = 0;
+  }
+
+  update() {
+    var g = 0.4;
+    this.aAcceleration = -1 * g / this.r * sin(this.angle);
+    this.aVelocity += this.aAcceleration;
+    this.angle += this.aVelocity;
+  }
+
+  display() {
+    var position = new PVector(this.r * sin(this.angle), this.r * cos(this.angle));
+    position.add(this.origin);
+
+    stroke(0);
+    fill(175);
+    line(this.origin.x, this.origin.y, position.x, position.y);
+    ellipse(position.x, position.y, 16, 16);
   }
 }

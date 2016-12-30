@@ -8,14 +8,18 @@ class FlowField {
 
     var fields = [];
 
+    var xoff = 0;
     for (var i = 0; i < this.cols; i++) {
+      var yoff = 0;
       var row = [];
       for (var j = 0; j < this.rows; j++) {
-        var theta = random() * TWO_PI;
+        var theta = map(noise(xoff, yoff), 0, 1, 0, TWO_PI);
         var v = createVector(cos(theta), sin(theta));
         row.push(v);
+        yoff += 0.1;
       }
       fields.push(row);
+      xoff += 0.1;
     }
     this.fields = fields;
   }
